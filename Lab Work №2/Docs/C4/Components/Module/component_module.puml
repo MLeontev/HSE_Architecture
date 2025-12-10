@@ -1,0 +1,62 @@
+@startuml C3 Users & Interviews Modules
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+AddComponentTag("users", $bgColor="#4ce0c5")
+AddComponentTag("interviews", $bgColor="#f2c14e")
+AddComponentTag("eventsBus", $bgColor="#222266", $fontColor="#ffffff")
+
+System_Boundary(c1, "Система онлайн-собеседований") {
+
+    Boundary(apiBackend, "API Backend") {
+
+        Component(api, "API", "ASP.NET Core")
+
+        Boundary(interviewsModule, "Модуль собеседований") {
+            Component(interviewsPresentation, "Interviews.Presentation", "NET Library", $tags="interviews")
+            Component(interviewsApplication, "Interviews.Application", ".NET Library", $tags="interviews")
+            Component(interviewsDomain, "Interviews.Domain", ".NET Library", $tags="interviews")
+            Component(interviewsInfrastructure, "Interviews.Infrastructure", ".NET Library", $tags="interviews")
+            Component(interviewsIntegrationEvents, "Interviews.IntegrationEvents", ".NET Library", $tags="interviews")
+            ComponentDb(interviewsData, "Interviews data", "schema", $tags="interviews")
+        }
+
+        Boundary(usersModule, "Модуль пользователей") {
+            Component(usersPresentation, "Users.Presentation", "NET Library", $tags="users")
+            Component(usersApplication, "Users.Application", ".NET Library", $tags="users")
+            Component(usersDomain, "Users.Domain", ".NET Library", $tags="users")
+            Component(usersInfrastructure, "Users.Infrastructure", ".NET Library", $tags="users")
+            Component(usersIntegrationEvents, "Users.IntegrationEvents", ".NET Library", $tags="users")
+            ComponentDb(usersData, "Users data", "schema", $tags="users")
+        }
+
+        ComponentQueue(eventsBus, "Events Bus", "In memory", $tags="eventsBus")
+    }
+}
+
+System_Ext(keycloak, "Keycloak", "Сервис авторизации и аутентификации")
+Rel(usersPresentation, keycloak, "Использует для аутентификации пользователей", "HTTP")
+
+Rel(api, usersPresentation, "Использует")
+Rel(usersPresentation, usersApplication, "Использует")
+Rel(usersApplication, usersDomain, "Использует")
+Rel(usersInfrastructure, usersApplication, "Использует")
+Rel(usersInfrastructure, usersDomain, "Использует")
+Rel(usersInfrastructure, usersData, "Чтение / запись")
+Rel(usersApplication, usersIntegrationEvents, "Использует")
+Rel(usersInfrastructure, eventsBus, "Публикует/подписывается на события")
+Rel(usersPresentation, usersIntegrationEvents, "Использует")
+
+Rel(api, interviewsPresentation, "Использует")
+Rel(interviewsPresentation, interviewsApplication, "Использует")
+Rel(interviewsApplication, interviewsDomain, "Использует")
+Rel(interviewsInfrastructure, interviewsApplication, "Использует")
+Rel(interviewsInfrastructure, interviewsDomain, "Использует")
+Rel(interviewsInfrastructure, interviewsData, "Чтение / запись")
+Rel(interviewsApplication, interviewsIntegrationEvents, "Использует")
+Rel(interviewsInfrastructure, eventsBus, "Публикует/подписывается на события")
+Rel(interviewsPresentation, interviewsIntegrationEvents, "Использует")
+
+Rel(usersPresentation, interviewsIntegrationEvents, "Использует")
+Rel(interviewsPresentation, usersIntegrationEvents, "Использует")
+
+@enduml
