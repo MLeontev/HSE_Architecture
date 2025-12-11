@@ -5,32 +5,32 @@ AddComponentTag("users", $bgColor="#4ce0c5")
 AddComponentTag("interviews", $bgColor="#f2c14e")
 AddComponentTag("eventsBus", $bgColor="#222266", $fontColor="#ffffff")
 
-System_Boundary(c1, "Система онлайн-собеседований") {
+Boundary(apiBackend, "API Backend") {
 
-    Boundary(apiBackend, "API Backend") {
+    Component(api, "API", "ASP.NET Core")
 
-        Component(api, "API", "ASP.NET Core")
-
-        Boundary(interviewsModule, "Модуль собеседований") {
-            Component(interviewsPresentation, "Interviews.Presentation", "NET Library", $tags="interviews")
-            Component(interviewsApplication, "Interviews.Application", ".NET Library", $tags="interviews")
-            Component(interviewsDomain, "Interviews.Domain", ".NET Library", $tags="interviews")
-            Component(interviewsInfrastructure, "Interviews.Infrastructure", ".NET Library", $tags="interviews")
-            Component(interviewsIntegrationEvents, "Interviews.IntegrationEvents", ".NET Library", $tags="interviews")
-            ComponentDb(interviewsData, "Interviews data", "schema", $tags="interviews")
-        }
-
-        Boundary(usersModule, "Модуль пользователей") {
-            Component(usersPresentation, "Users.Presentation", "NET Library", $tags="users")
-            Component(usersApplication, "Users.Application", ".NET Library", $tags="users")
-            Component(usersDomain, "Users.Domain", ".NET Library", $tags="users")
-            Component(usersInfrastructure, "Users.Infrastructure", ".NET Library", $tags="users")
-            Component(usersIntegrationEvents, "Users.IntegrationEvents", ".NET Library", $tags="users")
-            ComponentDb(usersData, "Users data", "schema", $tags="users")
-        }
-
-        ComponentQueue(eventsBus, "Events Bus", "In memory", $tags="eventsBus")
+    Boundary(interviewsModule, "Модуль собеседований") {
+        Component(interviewsPresentation, "Interviews.Presentation", "NET Library", $tags="interviews")
+        Component(interviewsApplication, "Interviews.Application", ".NET Library", $tags="interviews")
+        Component(interviewsDomain, "Interviews.Domain", ".NET Library", $tags="interviews")
+        Component(interviewsInfrastructure, "Interviews.Infrastructure", ".NET Library", $tags="interviews")
+        Component(interviewsIntegrationEvents, "Interviews.IntegrationEvents", ".NET Library", $tags="interviews")
     }
+
+    Boundary(usersModule, "Модуль пользователей") {
+        Component(usersPresentation, "Users.Presentation", "NET Library", $tags="users")
+        Component(usersApplication, "Users.Application", ".NET Library", $tags="users")
+        Component(usersDomain, "Users.Domain", ".NET Library", $tags="users")
+        Component(usersInfrastructure, "Users.Infrastructure", ".NET Library", $tags="users")
+        Component(usersIntegrationEvents, "Users.IntegrationEvents", ".NET Library", $tags="users")
+    }
+
+    ComponentQueue(eventsBus, "Events Bus", "In memory", $tags="eventsBus")
+}
+
+Boundary(database, "База данных") {
+    ComponentDb(usersData, "Данные пользователей", "schema", $tags="users")
+    ComponentDb(interviewsData, "Данные собеседований", "schema", $tags="interviews")
 }
 
 System_Ext(keycloak, "Keycloak", "Сервис авторизации и аутентификации")
