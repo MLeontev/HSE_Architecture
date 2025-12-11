@@ -1,0 +1,18 @@
+@startuml SystemContext
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+
+Person(candidate, "Кандидат-разработчик", "Кандидат в разработчики, участник пробных собеседований")
+Person(contentManager, "Контент-менеджер", "Ведет базу вопросов и задач")
+
+System(interviewSystem, "Система онлайн-собеседований", "Позволяет пользователям проходить пробные собеседования и проверять свои навыки")
+
+System_Ext(keycloak, "Keycloak", "Сервис аутентификации и авторизации")
+System_Ext(aiAPI, "AI API", "Внешнее API для генерации обратной связи к ответам пользователей")
+
+Rel(candidate, interviewSystem, "Проходит пробные собеседования, получает отчёты и рекомендации")
+Rel(contentManager, interviewSystem, "Обновляет базу вопросов и задач, категоризует их")
+Rel(interviewSystem, keycloak, "Использует для аутентификации пользователей")
+Rel(interviewSystem, aiAPI, "Запрашивает оценку и обратную связь по ответам кандидата")
+
+LAYOUT_WITH_LEGEND()
+@enduml

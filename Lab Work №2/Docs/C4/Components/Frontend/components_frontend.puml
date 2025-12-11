@@ -1,0 +1,43 @@
+@startuml Components_Frontend
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+Person(candidate, "Кандидат-разработчик")
+Person(contentManager, "Контент-менеджер")
+
+Boundary(webApp, "Веб-приложение (React)") {
+    Component(router, "Маршрутизатор (Router)", "React Router", "Управляет навигацией между страницами")
+    
+    Component(apiClient, "API Клиент", "Axios", "Отправляет HTTP-запросы к API Backend")
+    
+    Component(authPage, "Страница Аутентификации", "React Component", "Вход,  регистрация")
+    
+    Component(interviewPage, "Страница Собеседования", "React Component", "Интерфейс для прохождения интервью, редактор кода, отображение заданий")
+    
+    Component(reportPage, "Страница Результатов/Отчетов", "React Component", "Отображение результатов и обратной связи от AI")
+    
+    Component(contentManagerPanel, "Панель Контент-менеджера", "React Component", "Интерфейс для управления базой вопросов и задач")
+}
+
+Container(apiBackend, "API Backend", "ASP.NET Core", "Обеспечивает управление пользователями, сессиями, задачами")
+
+Rel(candidate, authPage, "Использует для входа/регистрации")
+Rel(candidate, interviewPage, "Проходит интервью")
+Rel(candidate, reportPage, "Просматривает отчёты")
+
+Rel(contentManager, authPage, "Использует для входа")
+Rel(contentManager, contentManagerPanel, "Управляет контентом")
+
+Rel(router, authPage, "Перенаправляет на страницу аутентификации")
+Rel(router, interviewPage, "Перенаправляет на страницу собеседования")
+Rel(router, reportPage, "Перенаправляет на страницу отчетов")
+Rel(router, contentManagerPanel, "Перенаправляет на панель управления")
+
+Rel(authPage, apiClient, "Отправляет данные аутентификации")
+Rel(interviewPage, apiClient, "Отправляет решения, запрашивает задания")
+Rel(reportPage, apiClient, "Запрашивает результаты")
+Rel(contentManagerPanel, apiClient, "Отправляет/запрашивает данные о вопросах/задачах")
+
+Rel(apiClient, apiBackend, "Отправляет запросы через API", "HTTP")
+
+LAYOUT_WITH_LEGEND()
+@enduml

@@ -1,0 +1,43 @@
+@startuml Components
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+Container(spa, "Веб-приложение", "React", "Пользовательский интерфейс")
+
+Boundary(interviewTrainerApi, "API Backend") {
+    
+    Component(api, "API", "ASP.NET Core")
+    
+    Component(usersModule, "Модуль пользователей", ".NET Libraries")
+    Component(questionBankModule, "Модуль банка задач", ".NET Libraries")
+    Component(interviewModule, "Модуль собеседований", ".NET Libraries")
+    Component(codeRunnerModule, "Модуль выполнения кода", ".NET Libraries")
+    
+    ComponentQueue(eventsBus, "Events Bus", "In memory")
+}
+
+ContainerDb(database, "База данных", "PostgreSQL", "Хранит пользователей, задания, тест-кейсы, результаты собеседований")
+
+System_Ext(keycloak, "Keycloak", "Сервис авторизации и аутентификации")
+System_Ext(aiAPI, "AI API", "Внешнее API для генерации обратной связи")
+
+Rel(spa, api, "Выполняет запросы через API", "HTTP")
+Rel(api, usersModule, "Вызывает функции управления пользователями")
+Rel(api, questionBankModule, "Вызывает функции работы с банком вопросов")
+Rel(api, interviewModule, "Управляет сессиями собеседований")
+Rel(api, codeRunnerModule, "Отправляет код на выполнение")
+
+Rel(usersModule, database, "Чтение/запись")
+Rel(questionBankModule, database, "Чтение/запись")
+Rel(interviewModule, database, "Чтение/запись")
+Rel(codeRunnerModule, database, "Чтение/запись")
+
+Rel(usersModule, eventsBus, "Публикует/подписывается на события")
+Rel(questionBankModule, eventsBus, "Публикует/подписывается на события")
+Rel(interviewModule, eventsBus, "Публикует/подписывается на события")
+Rel(codeRunnerModule, eventsBus, "Публикует/подписывается на события")
+
+Rel(usersModule, keycloak, "Использует для аутентификации", "HTTP")
+Rel(interviewModule, aiAPI, "Запрашивает оценку и обратную связь", "HTTP")
+
+LAYOUT_WITH_LEGEND()
+@enduml

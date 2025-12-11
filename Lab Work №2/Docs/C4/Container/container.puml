@@ -1,0 +1,28 @@
+@startuml Containers
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+Person(candidate, "Кандидат-разработчик", "Кандидат в разработчики, участник пробных собеседований")
+Person(contentManager, "Контент-менеджер", "Ведет базу вопросов и задач")
+
+System_Boundary(interviewSystem, "Система онлайн-собеседований") {
+    
+    Container(webApp, "Веб-приложение", "React", "Предоставляет интерфейс для прохождения собеседований, просмотра отчетов и управления контентом")
+
+    Container(apiBackend, "API Backend", "ASP.NET Core", "Обеспечивает управление пользователями, сессиями, задачами, отправку решений на проверку")
+
+    ContainerDb(database, "База данных", "PostgreSQL", "Хранит пользователей, задания, тест-кейсы, результаты собеседований")
+}
+
+System_Ext(keycloak, "Keycloak", "Сервис авторизации и аутентификации")
+System_Ext(aiAPI, "AI API", "Внешнее API для генерации обратной связи к ответам пользователей")
+
+Rel(candidate, webApp, "Проходит пробные собеседования, получает отчёты и рекомендации")
+Rel(contentManager, webApp, "Обновляет базу вопросов и задач, категоризует их")
+
+Rel(webApp, apiBackend, "Выполняет запросы через API", "HTTP")
+Rel(apiBackend, database, "Чтение и запись данных", "SQL")
+Rel(apiBackend, keycloak, "Использует для аутентификации пользователей", "HTTP")
+Rel(apiBackend, aiAPI, "Запрашивает оценку и обратную связь по ответам кандидата", "HTTP")
+
+LAYOUT_WITH_LEGEND()
+@enduml
