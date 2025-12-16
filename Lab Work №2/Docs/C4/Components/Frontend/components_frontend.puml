@@ -20,12 +20,8 @@ Boundary(webApp, "Веб-приложение (React)") {
 
 Container(apiBackend, "API Backend", "ASP.NET Core", "Обеспечивает управление пользователями, сессиями, задачами")
 
-Rel(candidate, authPage, "Использует для входа/регистрации")
-Rel(candidate, interviewPage, "Проходит интервью")
-Rel(candidate, reportPage, "Просматривает отчёты")
-
-Rel(contentManager, authPage, "Использует для входа")
-Rel(contentManager, contentManagerPanel, "Управляет контентом")
+Rel(candidate, router, "Использует веб-приложение")
+Rel(contentManager, router, "Использует веб-приложение")
 
 Rel(router, authPage, "Перенаправляет на страницу аутентификации")
 Rel(router, interviewPage, "Перенаправляет на страницу собеседования")
