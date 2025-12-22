@@ -1,0 +1,123 @@
+@startuml
+skinparam classAttributeIconSize 0
+
+class languages {
+    +uuid id
+    +varchar code
+    +varchar name
+    +varchar version
+    +boolean is_active
+    +boolean is_compiled
+    +varchar docker_image
+    +varchar run_command_template
+    +varchar compile_command_template
+    +varchar file_name
+    +integer timeout
+    +integer max_memory_mb
+    +integer max_cpu_cores
+}
+
+class users {
+    +uuid id
+    +varchar email
+    +varchar first_name
+    +varchar last_name
+    +varchar identity_id
+}
+
+class categories {
+    +uuid id
+    +varchar type
+    +varchar name
+}
+
+class tasks {
+    +uuid id
+    +varchar title
+    +text description
+    +varchar type
+    +text reference_solution
+    +integer time_limit_ms
+    +integer memory_limit_mb
+}
+
+class task_categories {
+    +uuid task_id
+    +uuid category_id
+}
+
+class task_languages {
+    +uuid task_id
+    +uuid language_id
+}
+
+class interviews {
+    +uuid id
+    +uuid user_id
+    +uuid selected_language_id
+    +timestamp start_time
+    +timestamp end_time
+    +varchar status
+    +jsonb llm_feedback
+}
+
+class interview_tasks {
+    +uuid id
+    +uuid interview_id
+    +uuid task_id
+    +integer order_index
+}
+
+class test_cases {
+    +uuid id
+    +uuid task_id
+    +text input_data
+    +text expected_output
+    +integer order_index
+    +boolean is_hidden
+}
+
+class theory_answers {
+    +uuid interview_task_id
+    +text answer_text
+    +timestamp created_at
+    +varchar status
+}
+
+class code_answers {
+    +uuid id
+    +uuid interview_task_id
+    +text code_text
+    +timestamp created_at
+    +varchar status
+}
+
+class code_test_results {
+    +uuid id
+    +uuid code_answer_id
+    +uuid test_case_id
+    +text actual_output
+    +text error_message
+    +integer execution_time_ms
+    +integer memory_used_kb
+}
+
+users "1" -- "0..*" interviews
+
+tasks "1" -- "0..*" task_categories
+categories "1" -- "0..*" task_categories
+
+tasks "1" -- "0..*" task_languages
+languages "1" -- "0..*" task_languages
+
+tasks "1" -- "0..*" test_cases
+
+interviews "1" -- "1..*" interview_tasks
+tasks "1" -- "0..*" interview_tasks
+
+interview_tasks "1" -- "0..1" theory_answers
+
+interview_tasks "1" -- "0..*" code_answers
+code_answers "1" -- "0..*" code_test_results
+
+@enduml
