@@ -1,0 +1,63 @@
+@startuml
+title Пройти собеседование
+
+actor "Кандидат-разработчик" as Candidate
+
+participant "Веб-приложение" as spa
+participant "API" as api
+
+participant "Модуль собеседований" as interviewModule
+participant "Модуль банка задач" as questionBankModule
+participant "Модуль выполнения кода" as codeRunnerModule
+
+database "База данных" as database
+participant "AI API" as aiAPI
+
+== Запуск собеседования ==
+
+Candidate -> spa : Начать собеседование
+spa -> api : POST /interviews/start
+
+api -> interviewModule : Создать сессию
+interviewModule -> database : Сохранить сессию
+
+interviewModule -> questionBankModule : Получить задания
+questionBankModule -> database : Загрузка вопросов и задач
+questionBankModule --> interviewModule : Набор заданий
+
+interviewModule --> api : Данные сессии
+api --> spa : Вопросы и задачи
+
+== Решение задачи ==
+
+Candidate -> spa : Вводит решение (код)
+spa -> api : POST /interviews/{id}/submit
+
+api -> codeRunnerModule : Выполнить код
+codeRunnerModule -> database : Получить тест-кейсы
+codeRunnerModule -> codeRunnerModule : Выполнение кода
+codeRunnerModule --> api : Результаты выполнения
+
+api -> interviewModule : Сохранить результат
+interviewModule -> database : Запись результата
+
+== Теоретические вопросы ==
+
+Candidate -> spa : Отвечает на теоретические вопросы
+spa -> api : POST /interviews/{id}/theory
+
+api -> interviewModule : Сохранить ответы
+interviewModule -> database : Запись ответов
+
+== Оценка и завершение ==
+
+interviewModule -> aiAPI : Запросить итоговую оценку и feedback
+aiAPI --> interviewModule : Итоговая оценка и комментарии
+
+interviewModule -> database : Сохранить feedback
+interviewModule --> api : Итог собеседования
+api --> spa : Результаты и обратная связь
+
+Candidate -> spa : Просматривает отчёт
+
+@enduml
