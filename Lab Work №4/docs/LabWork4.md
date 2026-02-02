@@ -129,11 +129,11 @@
 | `text`                    | string                         | Текст вопроса                                                                                                   |
 | `type`                    | string (`Theory` или `Coding`) | Тип вопроса: теория или кодинг                                                                                  |
 | `programmingLanguageCode` | string или null                | Код языка программирования для кодингового вопроса (например, `"csharp"`); null для теории                      |
-| `orderIndex`              | integer                        | Порядковый номер вопроса в сессии                                                                               |
+| `orderIndex`              | number                         | Порядковый номер вопроса в сессии                                                                               |
 | `status`                  | string                         | Текущий статус вопроса (`NotStarted`, `InProgress`, `Submitted`, `EvaluatingCode`, `EvaluatingAi`, `Evaluated`) |
 | `answer`                  | string или null                | Текущий ответ кандидата на вопрос                                                                               |
-| `timeLimitMs`             | integer или null               | Ограничение времени на выполнение кода (в миллисекундах); null для теоретических вопросов                       |
-| `memoryLimitMb`           | integer или null               | Ограничение памяти на выполнение кода (в мегабайтах); null для теоретических вопросов                           |
+| `timeLimitMs`             | number или null                | Ограничение времени на выполнение кода (в миллисекундах); null для теоретических вопросов                       |
+| `memoryLimitMb`           | number или null                | Ограничение памяти на выполнение кода (в мегабайтах); null для теоретических вопросов                           |
 | `testCases`               | массив TestCaseDto             | Список тестовых кейсов для кодингового вопроса (пустой для теоретических)                                       |
 
 **Структура TestCaseDto:**
