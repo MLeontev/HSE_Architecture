@@ -1,0 +1,44 @@
+﻿services:
+  frontend:
+    image: interviewsimulator-frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - '3000:80'
+    depends_on:
+      - api
+
+  api:
+    image: interviewsimulator-api
+    build:
+      context: .
+      dockerfile: InterviewSimulator.API/Dockerfile
+    ports:
+      - '8080:8080'
+      - '8081:8081'
+    environment:
+      - ConnectionStrings__DefaultConnection=Server=db;Port=5432;User Id=postgres;Password=postgres;Database=InterviewSimulator;
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: InterviewSimulator
+    volumes:
+      - pg-data:/var/lib/postgresql
+    ports:
+      - '5433:5432'
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: always
+
+volumes:
+  pg-data:
