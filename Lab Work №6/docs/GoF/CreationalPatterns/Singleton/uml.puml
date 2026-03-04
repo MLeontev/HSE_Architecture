@@ -1,52 +1,31 @@
 @startuml
 skinparam classAttributeIconSize 0
 
-interface "IPrototype<T>" as IPrototypeT {
-  + Clone(): T
+class LanguageProvider <<Singleton>> {
+  - runtimeConfig: RuntimeConfig
+  + GetSupportedLanguages(): IEnumerable<SupportedLanguage>
+  + IsSupported(code: string): bool
+  + GetLanguage(code: string): LanguageInfo
 }
 
-class InterviewQuestionPrototype <<Prototype>> {
-  - _template: InterviewQuestion
-  + InterviewQuestionPrototype(dto: InterviewQuestionApiDto)
-  + Clone(): InterviewQuestion
-  + CloneForSession(sessionId: Guid, orderIndex: int): InterviewQuestion
-  - MapQuestionType(type: QuestionBank.InternalApi.QuestionType): Interview.Domain.QuestionType
+interface ILanguageProvider {
+  + GetSupportedLanguages(): IEnumerable<SupportedLanguage>
+  + IsSupported(code: string): bool
 }
 
-class InterviewQuestion <<Product>> {
-  + Id: Guid
-  + InterviewSessionId: Guid
-  + Text: string
-  + Type: Interview.Domain.QuestionType
-  + ProgrammingLanguageCode: string?
-  + OrderIndex: int
-  + ReferenceSolution: string
-  + Status: QuestionStatus
-  + OverallVerdict: Verdict
-  + TimeLimitMs: int?
-  + MemoryLimitMb: int?
-  + TestCases: List<TestCase>
+interface IExecutorLanguageProvider {
+  + GetLanguage(code: string): LanguageInfo
 }
 
-class InterviewQuestionApiDto {
-  + Text: string
-  + Type: QuestionBank.InternalApi.QuestionType
-  + ProgrammingLanguageCode: string?
-  + TimeLimitMs: int?
-  + MemoryLimitMb: int?
-  + ReferenceSolution: string
-  + TestCases: List<TestCaseApiDto>
+class RuntimeConfig <<Singleton>> {
+  - _languages: Dictionary<string, LanguageInfo>
+  + RuntimeConfig(configuration: IConfiguration)
+  + Get(code: string): LanguageInfo
+  + GetAll(): IEnumerable<LanguageInfo>
 }
 
-class CreateInterviewSessionCommandHandler {
-  + Handle(request, ct): Task<Result<Guid>>
-}
+LanguageProvider ..|> ILanguageProvider
+LanguageProvider ..|> IExecutorLanguageProvider
+LanguageProvider --> RuntimeConfig : uses
 
-InterviewQuestionPrototype ..|> IPrototypeT
-InterviewQuestionPrototype --> InterviewQuestion : holds template\n(_template)
-InterviewQuestionPrototype ..> InterviewQuestionApiDto : builds from dto
-InterviewQuestionPrototype --> InterviewQuestion : clones
-
-CreateInterviewSessionCommandHandler ..> InterviewQuestionPrototype : creates prototypes
-CreateInterviewSessionCommandHandler ..> InterviewQuestion : uses clones
 @enduml
