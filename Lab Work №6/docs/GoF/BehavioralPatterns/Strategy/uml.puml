@@ -1,0 +1,43 @@
+@startuml
+skinparam classAttributeIconSize 0
+
+class CodeExecutor <<Context>> {
+  - languageProvider: IExecutorLanguageProvider
+  - executionRequestStrategies: IEnumerable<IExecutionRequestStrategy>
+  + ExecuteCode(code: string, input: string, language: string, ct: CancellationToken): Task<CodeExecutionResult>
+}
+
+interface IExecutionRequestStrategy <<Strategy>> {
+  + CanHandle(languageInfo: LanguageInfo): bool
+  + Build(code: string, input: string, languageInfo: LanguageInfo): ExecuteCodeRequest
+}
+
+abstract class ExecutionRequestStrategyBase <<AbstractStrategy>> {
+  + Build(code: string, input: string, languageInfo: LanguageInfo): ExecuteCodeRequest
+  # BuildRunCommandRaw(languageInfo: LanguageInfo): string
+  # BuildCompileCommand(languageInfo: LanguageInfo): string
+  - BuildTimedRunCommand(runCommandRaw: string): string
+}
+
+class CompiledExecutionRequestStrategy <<ConcreteStrategy>> {
+  + CanHandle(languageInfo: LanguageInfo): bool
+  # BuildRunCommandRaw(languageInfo: LanguageInfo): string
+  # BuildCompileCommand(languageInfo: LanguageInfo): string
+}
+
+class InterpretedExecutionRequestStrategy <<ConcreteStrategy>> {
+  + CanHandle(languageInfo: LanguageInfo): bool
+  # BuildRunCommandRaw(languageInfo: LanguageInfo): string
+}
+
+class ExecuteCodeRequest
+
+CodeExecutor --> IExecutionRequestStrategy : selects & uses\n(CanHandle/Build)
+
+ExecutionRequestStrategyBase ..|> IExecutionRequestStrategy
+CompiledExecutionRequestStrategy --|> ExecutionRequestStrategyBase
+InterpretedExecutionRequestStrategy --|> ExecutionRequestStrategyBase
+
+IExecutionRequestStrategy ..> ExecuteCodeRequest : creates
+
+@enduml

@@ -1,0 +1,31 @@
+@startuml
+skinparam classAttributeIconSize 0
+
+class CreateInterviewSessionCommandHandler <<Client>>
+
+interface IQuestionBankApi <<Subject>> {
+  + GetQuestionsAsync(interviewPresetId: Guid, totalQuestions: int): Task<IReadOnlyList<InterviewQuestionApiDto>>
+  + GetPresetAsync(interviewPresetId: Guid): Task<InterviewPresetApiDto?>
+}
+
+class QuestionBankApi <<RealSubject>>
+
+class CachedQuestionBankApiProxy <<Proxy>> {
+  - inner: IQuestionBankApi
+  - cache: IMemoryCache
+  - {static} PresetTtl: TimeSpan
+  + GetQuestionsAsync(interviewPresetId: Guid, totalQuestions: int): Task<IReadOnlyList<InterviewQuestionApiDto>>
+  + GetPresetAsync(interviewPresetId: Guid): Task<InterviewPresetApiDto?>
+}
+
+interface IMemoryCache
+
+CreateInterviewSessionCommandHandler --> IQuestionBankApi : uses
+
+QuestionBankApi ..|> IQuestionBankApi
+CachedQuestionBankApiProxy ..|> IQuestionBankApi
+
+CachedQuestionBankApiProxy --> IQuestionBankApi : wraps (inner)
+CachedQuestionBankApiProxy --> IMemoryCache : uses
+
+@enduml

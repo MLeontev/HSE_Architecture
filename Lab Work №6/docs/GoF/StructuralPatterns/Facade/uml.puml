@@ -1,0 +1,32 @@
+@startuml
+skinparam classAttributeIconSize 0
+
+interface IQuestionBankApi {
+  + GetQuestionsAsync(interviewPresetId: Guid, totalQuestions: int): Task<IReadOnlyList<InterviewQuestionApiDto>>
+  + GetPresetAsync(interviewPresetId: Guid): Task<InterviewPresetApiDto?>
+}
+
+class QuestionBankApi <<Facade>> {
+  - sender: ISender
+  + GetQuestionsAsync(interviewPresetId: Guid, totalQuestions: int): Task<IReadOnlyList<InterviewQuestionApiDto>>
+  + GetPresetAsync(interviewPresetId: Guid): Task<InterviewPresetApiDto?>
+  - MapQuestionType(type: Domain.QuestionType): QuestionType
+}
+
+interface ISender <<MediatR>>
+
+class GenerateInterviewQuestionsQuery <<Query>>
+class GetInterviewPresetByIdQuery <<Query>>
+
+class CreateInterviewSessionCommandHandler <<Client>> {
+  - questionBankApi: IQuestionBankApi
+  + Handle(request, ct): Task<Result<Guid>>
+}
+
+CreateInterviewSessionCommandHandler --> IQuestionBankApi : calls
+QuestionBankApi ..|> IQuestionBankApi
+QuestionBankApi --> ISender : uses
+QuestionBankApi ..> GenerateInterviewQuestionsQuery : sends
+QuestionBankApi ..> GetInterviewPresetByIdQuery : sends
+
+@enduml

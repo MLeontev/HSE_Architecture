@@ -1,0 +1,34 @@
+@startuml
+skinparam classAttributeIconSize 0
+
+class CreateInterviewSessionCommandHandler {
+  + Handle(request, ct): Task<Result<Guid>>
+}
+
+class InterviewSessionBuilder <<Builder>> {
+  - _session: InterviewSession
+  + WithSessionId(sessionId: Guid): InterviewSessionBuilder
+  + ForCandidate(candidateId: Guid): InterviewSessionBuilder
+  + WithPresetName(presetName: string): InterviewSessionBuilder
+  + StartsAt(startUtc: DateTime): InterviewSessionBuilder
+  + WithDuration(duration: TimeSpan): InterviewSessionBuilder
+  + WithQuestions(questions: IReadOnlyList<InterviewQuestion>): InterviewSessionBuilder
+  + InProgress(): InterviewSessionBuilder
+  + Build(): InterviewSession
+}
+
+class InterviewSession <<Product>> {
+  + Id: Guid
+  + CandidateId: Guid
+  + InterviewPresetName: string
+  + StartTime: DateTime
+  + EndTime: DateTime
+  + Status: InterviewStatus
+  + AiFeedbackJson: string?
+  + Questions: List<InterviewQuestion>
+}
+
+CreateInterviewSessionCommandHandler ..> InterviewSessionBuilder : uses
+InterviewSessionBuilder --> InterviewSession : builds
+
+@enduml

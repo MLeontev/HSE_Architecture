@@ -1,0 +1,52 @@
+@startuml
+skinparam classAttributeIconSize 0
+
+interface "IPrototype<T>" as IPrototypeT {
+  + Clone(): T
+}
+
+class InterviewQuestionPrototype <<Prototype>> {
+  - _template: InterviewQuestion
+  + InterviewQuestionPrototype(dto: InterviewQuestionApiDto)
+  + Clone(): InterviewQuestion
+  + CloneForSession(sessionId: Guid, orderIndex: int): InterviewQuestion
+  - MapQuestionType(type: QuestionBank.InternalApi.QuestionType): Interview.Domain.QuestionType
+}
+
+class InterviewQuestion <<Product>> {
+  + Id: Guid
+  + InterviewSessionId: Guid
+  + Text: string
+  + Type: Interview.Domain.QuestionType
+  + ProgrammingLanguageCode: string?
+  + OrderIndex: int
+  + ReferenceSolution: string
+  + Status: QuestionStatus
+  + OverallVerdict: Verdict
+  + TimeLimitMs: int?
+  + MemoryLimitMb: int?
+  + TestCases: List<TestCase>
+}
+
+class InterviewQuestionApiDto {
+  + Text: string
+  + Type: QuestionBank.InternalApi.QuestionType
+  + ProgrammingLanguageCode: string?
+  + TimeLimitMs: int?
+  + MemoryLimitMb: int?
+  + ReferenceSolution: string
+  + TestCases: List<TestCaseApiDto>
+}
+
+class CreateInterviewSessionCommandHandler {
+  + Handle(request, ct): Task<Result<Guid>>
+}
+
+InterviewQuestionPrototype ..|> IPrototypeT
+InterviewQuestionPrototype --> InterviewQuestion : holds template\n(_template)
+InterviewQuestionPrototype ..> InterviewQuestionApiDto : builds from dto
+InterviewQuestionPrototype --> InterviewQuestion : clones
+
+CreateInterviewSessionCommandHandler ..> InterviewQuestionPrototype : creates prototypes
+CreateInterviewSessionCommandHandler ..> InterviewQuestion : uses clones
+@enduml

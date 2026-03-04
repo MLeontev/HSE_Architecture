@@ -1,0 +1,36 @@
+@startuml
+skinparam classAttributeIconSize 0
+
+class InterviewSessionsController <<Client>> {
+  - sender: ISender
+  + CreateSession(request: CreateSessionRequest, cancellationToken: CancellationToken): Task<IActionResult>
+}
+
+interface ISender <<Dispatcher>> {
+  + Send<TResponse>(request: IRequest<TResponse>, ct: CancellationToken): Task<TResponse>
+}
+
+interface "IRequest<Result<Guid>>" as IRequestGuid <<Command>>
+
+class CreateInterviewSessionCommand <<ConcreteCommand>> {
+  + CandidateId: Guid
+  + InterviewPresetId: Guid
+}
+
+interface "IRequestHandler<CreateInterviewSessionCommand, Result<Guid>>" as IHandler <<Handler>> {
+  + Handle(request: CreateInterviewSessionCommand, ct: CancellationToken): Task<Result<Guid>>
+}
+
+class CreateInterviewSessionCommandHandler <<ConcreteHandler>> {
+  + Handle(request: CreateInterviewSessionCommand, ct: CancellationToken): Task<Result<Guid>>
+}
+
+InterviewSessionsController --> ISender : Send(command)
+CreateInterviewSessionCommand ..|> IRequestGuid
+CreateInterviewSessionCommandHandler ..|> IHandler
+
+ISender ..> IRequestGuid : dispatches
+ISender ..> IHandler : routes to handler
+IHandler ..> CreateInterviewSessionCommand : handles
+
+@enduml

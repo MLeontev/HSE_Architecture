@@ -1,0 +1,23 @@
+@startuml
+skinparam classAttributeIconSize 0
+
+class CreateInterviewSessionCommandHandler <<Client>>
+
+interface IQuestionBankApi <<Component>> {
+  + GetQuestionsAsync(interviewPresetId: Guid, totalQuestions: int): Task<IReadOnlyList<InterviewQuestionApiDto>>
+  + GetPresetAsync(interviewPresetId: Guid): Task<InterviewPresetApiDto?>
+}
+
+class QuestionBankApi <<ConcreteComponent>>
+class LoggingQuestionBankApiDecorator <<ConcreteDecorator>> {
+  - inner: IQuestionBankApi
+  - logger: ILogger<LoggingQuestionBankApiDecorator>
+}
+
+CreateInterviewSessionCommandHandler --> IQuestionBankApi : uses
+
+QuestionBankApi ..|> IQuestionBankApi
+LoggingQuestionBankApiDecorator ..|> IQuestionBankApi
+
+LoggingQuestionBankApiDecorator --> IQuestionBankApi : wraps (inner)
+@enduml
