@@ -1,0 +1,18 @@
+@startuml
+skinparam classAttributeIconSize 0
+
+class CodeSubmissionEventPublisher <<Publisher>>
+interface IBus <<Subject/EventBus>>
+class CodeSubmissionCompleted <<Event>>
+
+interface "IConsumer<CodeSubmissionCompleted>" as IConsumerEvent <<Observer>>
+class CodeSubmissionCompletedConsumer <<ConcreteObserver>>
+
+CodeSubmissionEventPublisher --> IBus : Publish(event)
+CodeSubmissionEventPublisher ..> CodeSubmissionCompleted : creates
+
+CodeSubmissionCompletedConsumer ..|> IConsumerEvent
+IConsumerEvent ..> CodeSubmissionCompleted : subscribes to
+
+IBus ..> IConsumerEvent : delivers event
+@enduml

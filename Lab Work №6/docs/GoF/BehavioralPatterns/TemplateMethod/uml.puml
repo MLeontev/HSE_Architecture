@@ -1,0 +1,27 @@
+@startuml
+skinparam classAttributeIconSize 0
+
+abstract class ExecutionRequestStrategyBase <<AbstractClass>> {
+  + Build(code: string, input: string, languageInfo: LanguageInfo): ExecuteCodeRequest  <<TemplateMethod>>
+  # BuildRunCommandRaw(languageInfo: LanguageInfo): string  <<PrimitiveOperation>>
+  # BuildCompileCommand(languageInfo: LanguageInfo): string  <<PrimitiveOperation>>
+  - BuildTimedRunCommand(runCommandRaw: string): string
+}
+
+class CompiledExecutionRequestStrategy <<ConcreteClass>> {
+  # BuildRunCommandRaw(languageInfo: LanguageInfo): string
+  # BuildCompileCommand(languageInfo: LanguageInfo): string
+}
+
+class InterpretedExecutionRequestStrategy <<ConcreteClass>> {
+  # BuildRunCommandRaw(languageInfo: LanguageInfo): string
+}
+
+class ExecuteCodeRequest
+
+CompiledExecutionRequestStrategy --|> ExecutionRequestStrategyBase
+InterpretedExecutionRequestStrategy --|> ExecutionRequestStrategyBase
+
+ExecutionRequestStrategyBase ..> ExecuteCodeRequest : creates
+
+@enduml

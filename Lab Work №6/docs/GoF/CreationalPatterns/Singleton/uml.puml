@@ -1,0 +1,31 @@
+@startuml
+skinparam classAttributeIconSize 0
+
+class LanguageProvider <<Singleton>> {
+  - runtimeConfig: RuntimeConfig
+  + GetSupportedLanguages(): IEnumerable<SupportedLanguage>
+  + IsSupported(code: string): bool
+  + GetLanguage(code: string): LanguageInfo
+}
+
+interface ILanguageProvider {
+  + GetSupportedLanguages(): IEnumerable<SupportedLanguage>
+  + IsSupported(code: string): bool
+}
+
+interface IExecutorLanguageProvider {
+  + GetLanguage(code: string): LanguageInfo
+}
+
+class RuntimeConfig <<Singleton>> {
+  - _languages: Dictionary<string, LanguageInfo>
+  + RuntimeConfig(configuration: IConfiguration)
+  + Get(code: string): LanguageInfo
+  + GetAll(): IEnumerable<LanguageInfo>
+}
+
+LanguageProvider ..|> ILanguageProvider
+LanguageProvider ..|> IExecutorLanguageProvider
+LanguageProvider --> RuntimeConfig : uses
+
+@enduml

@@ -1,0 +1,25 @@
+@startuml
+skinparam classAttributeIconSize 0
+
+class InterviewSessionsController <<Client>>
+
+interface ISender <<Mediator>> {
+  + Send<TResponse>(request: IRequest<TResponse>, ct: CancellationToken): Task<TResponse>
+}
+
+class Mediator <<ConcreteMediator>>
+
+interface "IRequestHandler<TRequest,TResponse>" as IRequestHandlerTR <<Colleague>>
+
+class CreateInterviewSessionCommandHandler <<ConcreteColleague>>
+class GetCandidateSessionsQueryHandler <<ConcreteColleague>>
+
+InterviewSessionsController --> ISender : Send(command/query)
+
+Mediator ..|> ISender
+CreateInterviewSessionCommandHandler ..|> IRequestHandlerTR
+GetCandidateSessionsQueryHandler ..|> IRequestHandlerTR
+
+Mediator ..> IRequestHandlerTR : resolves & invokes
+
+@enduml

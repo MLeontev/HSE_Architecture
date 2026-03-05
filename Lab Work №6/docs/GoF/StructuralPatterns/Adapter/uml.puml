@@ -1,0 +1,25 @@
+@startuml
+skinparam classAttributeIconSize 0
+
+class CodeSubmissionEventPublisher <<Client>> {
+  - eventAdapter: ICodeSubmissionCompletedEventAdapter
+  + ExecuteAsync(stoppingToken: CancellationToken): Task
+}
+
+interface ICodeSubmissionCompletedEventAdapter {
+  + Adapt(submission: CodeSubmission): CodeSubmissionCompleted
+}
+
+class CodeSubmissionCompletedEventAdapter <<Adapter>> {
+  + Adapt(submission: CodeSubmission): CodeSubmissionCompleted
+  - MapVerdict(verdict: Verdict): IntegrationEvents.Verdict
+}
+
+class CodeSubmission <<Adaptee>>
+class CodeSubmissionCompleted <<Target>>
+
+CodeSubmissionEventPublisher --> ICodeSubmissionCompletedEventAdapter : uses
+CodeSubmissionCompletedEventAdapter ..|> ICodeSubmissionCompletedEventAdapter
+CodeSubmissionCompletedEventAdapter --> CodeSubmission : adapts from
+CodeSubmissionCompletedEventAdapter --> CodeSubmissionCompleted : creates
+@enduml
